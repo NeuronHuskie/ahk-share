@@ -1,0 +1,28 @@
+<?xml version="****.0" encoding="UTF-8"?>
+<xfdf xmlns="http://ns.adobe.com/xfdf/" xml:space="preserve">
+<f href="W9-MASTER.pdf"/>
+<fields>
+
+<field name="fullname_entityname"><value>%fullname%</value></field>
+<field name="businessname"><value>%businessname%</value></field>
+<field name="taxclass_checkbox_ind_soleprop"><value>%taxclass_ind_soleprop%</value></field>
+<field name="taxclass_checkbox_ccorp"><value>%taxclass_ccorp%</value></field>
+<field name="taxclass_checkbox_scorp"><value>%taxclass_scorp%</value></field>
+<field name="taxclass_checkbox_partnership"><value>%taxclass_partnership%</value></field>
+<field name="taxclass_checkbox_trust_estate"><value>%taxclass_trust_estate%</value></field>
+<field name="taxclass_checkbox_llc"><value>%taxclass_llc%</value></field>
+<field name="exempt_payee_code"><value>%exempt_payee_code%</value></field>
+<field name="taxclass_checkbox_other"><value>%taxclass_other%</value></field>
+<field name="exemption_fatca_code"><value>%fatca_code%</value></field>
+<field name="foreign_partners_checkbox"><value>%foreign_partners%</value></field>
+<field name="street_address"><value>%street_address%</value></field>
+<field name="city_state_zip"><value>%city_state_zip%</value></field>
+<field name="account_numbers"><value>%account_numbers%</value></field>
+<field name="ssn_1"><value>%ssn_1%</value></field>
+<field name="ssn_2"><value>%ssn_2%<value></field>
+<field name="ssn_3"><value>%ssn_3%</value></field>
+<field name="ein_1"><value>%ein_1%<value></field>
+<field name="ein_2"><value>%ein_2%</value></field>
+
+</fields>
+</xfdf>
