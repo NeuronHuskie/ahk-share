@@ -6,14 +6,14 @@
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 
 ; move current window to zone
-^F1:: WinZones(,1)
-^F2:: WinZones(,2)
-^F3:: WinZones(,3)
-^F4:: WinZones(,4)
-^F5:: WinZones(,5)
+#1:: WinZones(,1)
+#2:: WinZones(,2)
+#3:: WinZones(,3)
+#4:: WinZones(,4)
+#5:: WinZones(,5)
 
 ; move specific window to zone
-^F10:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
+#6:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
 
 
 
