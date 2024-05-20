@@ -13,7 +13,7 @@
 #5:: WinZones(,5)
 
 ; move specific window to zone
-; #6:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
+; #1:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
 
 
 
