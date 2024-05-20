@@ -13,25 +13,25 @@
 #5:: WinZones(,5)
 
 ; move specific window to zone
-#6:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
+; #1:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
 
 
 
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 ;       FUNCTIONS
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-WinZones(win_title:='A', zone:='1') {
-    WinWait(win_title)
-    id          := WinActive(win_title)
-    positions   := MonitorZones()
-    ; _______________________________________
-    try {
-       winzones := positions[A_ComputerName][PrimaryMonitor()]
-       pos      := winzones[zone]
-       WinMove(pos.x, pos.y, pos.w, pos.h, 'ahk_id ' id)
-    }
-    catch 
-       MsgBox('Invalid monitor or zone specified.','WinZones',48)
+WinZones(win_title:='A', zone:=1) {
+   WinWait(win_title)
+   id          := WinActive(win_title)
+   positions   := GetMonitorPositions()
+   ; _______________________________________________________________
+   try {
+      wz       := positions[A_ComputerName][PrimaryMonitor()]
+      pos      := wz[zone]
+      WinMove(pos.x, pos.y, pos.w, pos.h, 'ahk_id ' id)
+   }
+   catch 
+      MsgBox("Invalid monitor or monitor specified.",'WinZones',48)
 }
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 PrimaryMonitor() {
