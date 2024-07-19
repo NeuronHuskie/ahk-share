@@ -1,37 +1,51 @@
-#Requires AutoHotkey 2.0.12+
+#Requires Autohotkey v2.0+
+#WinActivateForce
 #SingleInstance Force
 
+; █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+; █                     EXAMPLES                     █
+; █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+; use the CopyWinCoords() helper function to set up your zones
+
+; ╔──────────────────────────────────────────────────╗
+; ║           move current window to zone            ║
+; ╚──────────────────────────────────────────────────╝
+#1:: WinZones(1)
+#2:: WinZones(2)
+#3:: WinZones(3)
+#4:: WinZones(4)
+#5:: WinZones(5)
+
+; ╔──────────────────────────────────────────────────╗
+; ║           move specific window to zone           ║
+; ╚──────────────────────────────────────────────────╝
+#6:: WinZones(1, 'Gmail - Google Chrome ahk_exe chrome.exe')
+
+
+
+; █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+; █                    FUNCTIONS                     █
+; █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+CopyWinCoords() {
+   WinGetPos(&x, &y, &w, &h, 'A')
+   A_Clipboard := '{x:' x ', y:' y ', w:' w ', h:' h '}'
+   MsgBox('The active window position coords have been copied to the clipboard.')
+   return
+}
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-;       EXAMPLES
-; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-
-; move current window to zone
-#1:: WinZones(,1)
-#2:: WinZones(,2)
-#3:: WinZones(,3)
-#4:: WinZones(,4)
-#5:: WinZones(,5)
-
-; move specific window to zone
-; #1:: WinZones('Gmail - Google Chrome ahk_exe chrome.exe',1)
-
-
-
-; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-;       FUNCTIONS
-; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-WinZones(win_title:='A', zone:=1) {
-   WinWait(win_title)
-   id          := WinActive(win_title)
-   positions   := GetMonitorPositions()
-   ; _______________________________________________________________
-   try {
-      wz       := positions[A_ComputerName][PrimaryMonitor()]
-      pos      := wz[zone]
-      WinMove(pos.x, pos.y, pos.w, pos.h, 'ahk_id ' id)
-   }
-   catch 
-      MsgBox("Invalid monitor or monitor specified.",'WinZones',48)
+WinZones(zone:='1', win_title:='A') {
+    WinWait(win_title)
+    id          := WinActive(win_title)
+    positions   := MonitorZones()
+    ; _______________________________________
+    try {
+       winzones := positions[A_ComputerName][PrimaryMonitor()]
+       pos      := winzones[zone]
+       WinMove(pos.x, pos.y, pos.w, pos.h, 'ahk_id ' id)
+    }
+    catch 
+       MsgBox('Invalid monitor or zone specified.','WinZones',48)
 }
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 PrimaryMonitor() {
@@ -40,10 +54,10 @@ PrimaryMonitor() {
        h       := (M.Bottom - M.Top)
        pixels  := (w * h)
        if (M.Primary)
-           return (pixels = 8294400) ? "Monitor1"
-                : (pixels = 3686400) ? "Monitor2"
-                : (pixels = 2073600) ? "Monitor3"
-                : ""
+           return (pixels = 8294400) ? 'Monitor1'
+                : (pixels = 3686400) ? 'Monitor2'
+                : (pixels = 2073600) ? 'Monitor3'
+                : ''
    }
 }
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
@@ -75,13 +89,6 @@ MonitorZones() {
    return positions
 }
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-CopyWinCoords() {
-    WinGetPos(&x, &y, &w, &h, 'A')
-    A_Clipboard := '{x:' x ', y:' y ', w:' w ', h:' h '}'
-    MsgBox('The active window position coords have been copied to the clipboard.')
-    return
-}
-; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
 ; https://www.autohotkey.com/boards/viewtopic.php?p=567016#p567016
 ; ======================================================================================================================
 ; Multiple Display Monitors Functions -> msdn.microsoft.com/en-us/library/dd145072(v=vs.85).aspx =======================
@@ -90,7 +97,7 @@ CopyWinCoords() {
 ; ======================================================================================================================
 MDMF_Enum() {
    Monitors := Map(), Address := CallbackCreate(MDMF_EnumProc)
-   Success := DllCall("User32.dll\EnumDisplayMonitors", "Ptr", 0, "Ptr", 0, "Ptr", Address, "Ptr", ObjPtr(Monitors), "Int")
+   Success := DllCall('User32.dll\EnumDisplayMonitors', 'Ptr', 0, 'Ptr', 0, 'Ptr', Address, 'Ptr', ObjPtr(Monitors), 'Int')
    return (CallbackFree(Address), Success ? Monitors : false)
 }
 ; ======================================================================================================================
@@ -111,7 +118,7 @@ MDMF_EnumProc(HMON, HDC, PRECT, ObjectAddr) {
 ;    MONITOR_DEFAULTTONEAREST = 2 - Returns a handle to the display monitor that is nearest to the window.
 ; ======================================================================================================================
 MDMF_FromHWND(HWND, Flag?) {
-   return DllCall("User32.dll\MonitorFromWindow", "Ptr", HWND, "UInt", Flag ?? 0, "Ptr")
+   return DllCall('User32.dll\MonitorFromWindow', 'Ptr', HWND, 'UInt', Flag ?? 0, 'Ptr')
 }
 ; ======================================================================================================================
 ; Retrieves the display monitor that contains a specified point.
@@ -125,13 +132,13 @@ MDMF_FromHWND(HWND, Flag?) {
 MDMF_FromPoint(X?, Y?, Flag?) {
    if !IsSet(X) || !IsSet(Y) {
       PT := Buffer(8)
-      DllCall("User32.dll\GetCursorPos", "Ptr", PT, "Int")
+      DllCall('User32.dll\GetCursorPos', 'Ptr', PT, 'Int')
       if !IsSet(X)
-         X := NumGet(PT, 0, "Int")
+         X := NumGet(PT, 0, 'Int')
       if !IsSet(Y)
-         Y := NumGet(PT, 4, "Int")
+         Y := NumGet(PT, 4, 'Int')
    }
-   return DllCall("User32.dll\MonitorFromPoint", "Int64", (X & 0xFFFFFFFF) | (Y << 32), "UInt", Flag ?? 0, "Ptr")
+   return DllCall('User32.dll\MonitorFromPoint', 'Int64', (X & 0xFFFFFFFF) | (Y << 32), 'UInt', Flag ?? 0, 'Ptr')
 }
 ; ======================================================================================================================
 ; Retrieves the display monitor that has the largest area of intersection with a specified rectangle.
@@ -145,26 +152,26 @@ MDMF_FromPoint(X?, Y?, Flag?) {
 ; ======================================================================================================================
 MDMF_FromRect(X, Y, W, H, Flag?) {
    RC := Buffer(16)
-   DllCall("SetRect", "Ptr", RC, "Int", X, "Int", Y, "Int", X + W, "Int", Y + H, "Int")
-   return DllCall("User32.dll\MonitorFromRect", "Ptr", RC, "UInt", Flag ?? 0, "Ptr")
+   DllCall('SetRect', 'Ptr', RC, 'Int', X, 'Int', Y, 'Int', X + W, 'Int', Y + H, 'Int')
+   return DllCall('User32.dll\MonitorFromRect', 'Ptr', RC, 'UInt', Flag ?? 0, 'Ptr')
 }
 ; ======================================================================================================================
 ; Retrieves information about a display monitor.
 ; ======================================================================================================================
 MDMF_GetInfo(HMON) {
    MIEX := Buffer(104)
-   NumPut "UInt", 104, MIEX, 0
-   if DllCall("User32.dll\GetMonitorInfo", "Ptr", HMON, "Ptr", MIEX, "Int")
+   NumPut 'UInt', 104, MIEX, 0
+   if DllCall('User32.dll\GetMonitorInfo', 'Ptr', HMON, 'Ptr', MIEX, 'Int')
       return {Name:       (Name := StrGet(MIEX.Ptr + 40, 32))  ; CCHDEVICENAME = 32
-            , Num:        RegExReplace(Name, ".*(\d+)$", "$1")
-            , Left:       NumGet(MIEX,  4, "Int")    ; display rectangle
-            , Top:        NumGet(MIEX,  8, "Int")    ; "
-            , Right:      NumGet(MIEX, 12, "Int")    ; "
-            , Bottom:     NumGet(MIEX, 16, "Int")    ; "
-            , WALeft:     NumGet(MIEX, 20, "Int")    ; work area
-            , WATop:      NumGet(MIEX, 24, "Int")    ; "
-            , WARight:    NumGet(MIEX, 28, "Int")    ; "
-            , WABottom:   NumGet(MIEX, 32, "Int")    ; "
-            , Primary:    NumGet(MIEX, 36, "UInt")}  ; contains a non-zero value for the primary monitor.
+            , Num:        RegExReplace(Name, '.*(\d+)$', '$1')
+            , Left:       NumGet(MIEX,  4, 'Int')    ; display rectangle
+            , Top:        NumGet(MIEX,  8, 'Int')    ; '
+            , Right:      NumGet(MIEX, 12, 'Int')    ; '
+            , Bottom:     NumGet(MIEX, 16, 'Int')    ; '
+            , WALeft:     NumGet(MIEX, 20, 'Int')    ; work area
+            , WATop:      NumGet(MIEX, 24, 'Int')    ; '
+            , WARight:    NumGet(MIEX, 28, 'Int')    ; '
+            , WABottom:   NumGet(MIEX, 32, 'Int')    ; '
+            , Primary:    NumGet(MIEX, 36, 'UInt')}  ; contains a non-zero value for the primary monitor.
    return false
 }
