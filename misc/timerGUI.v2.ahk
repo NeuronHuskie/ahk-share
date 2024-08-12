@@ -1,6 +1,5 @@
 #Requires Autohotkey v2.0+
 #SingleInstance Force 
-#include <GUI\GetInput.v2>
 #include <Tooltip\WiseGui\WiseGui> ; https://www.autohotkey.com/boards/viewtopic.php?f=83&t=94044
 TraySetIcon(A_ScriptDir '\_icons\timer.png')
 ; _______________________________________________________________________________
