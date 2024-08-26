@@ -16,18 +16,18 @@
 ; test_file   := A_Desktop '\test1.pdf'
 ; zipper.zip(test_file, A_Desktop '\test_file.zip')
 
-; ; ╔──────────────────────────────────────────────────╗
-; ; ║                 zip files array                  ║
-; ; ╚──────────────────────────────────────────────────╝
+; ╔──────────────────────────────────────────────────╗
+; ║                 zip files array                  ║
+; ╚──────────────────────────────────────────────────╝
 ; test_files  := [
 ;     A_Desktop '\test1.pdf',
 ;     A_Desktop '\test2.pdf'
 ; ]
 ; zipper.zip(test_files, A_Desktop '\test_files.zip')
 
-; ; ╔──────────────────────────────────────────────────╗
-; ; ║                      unzip                       ║
-; ; ╚──────────────────────────────────────────────────╝
+; ╔──────────────────────────────────────────────────╗
+; ║                      unzip                       ║
+; ╚──────────────────────────────────────────────────╝
 ; test_zip    := A_Desktop '\test.zip'
 ; zipper.unzip(test_zip, A_Desktop '\test_zip_destination')
 
