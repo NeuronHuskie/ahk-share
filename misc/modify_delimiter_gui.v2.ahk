@@ -1,3 +1,6 @@
+#Requires Autohotkey v2.0+
+
+
 modify_delimiter_gui() {
     active_win := WinActive('A')
     tmp := A_Clipboard
