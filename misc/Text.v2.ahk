@@ -12,9 +12,22 @@ strRepeat(str, count) => strReplace(format( "{:" count "}",  "" ), " ", str)
 ThousandsSeparator(int) => RegExReplace(int, "(?(?<=\.)(*COMMIT)(*FAIL))\d(?=(\d{3})+(\D|$))", "$0,")
 ; _________________________________________
 InStrList(str, list*) {
-    for i, item in list 
-        if InStr(str, item)
-            return true
+    if !IsObject(str)
+        str := [str]
+    
+    for each, value in str {
+        for i, item in list {
+            if IsObject(item) {
+                for subitem in item {
+                    if InStr(value, subitem)
+                        return true
+                }
+            } else {
+                if InStr(value, item)
+                    return true
+            }
+        }
+    }
     return false
 }
 ; _________________________________________
