@@ -2,8 +2,8 @@
 
 
 modify_delimiter_gui() {
-    active_win := WinActive('A')
-    tmp := A_Clipboard
+    active_win  := WinActive('A')
+    tmp         := A_Clipboard
     ; ╔──────────────────────────────────────────────────╗
     ; ║                define delimiters                 ║
     ; ╚──────────────────────────────────────────────────╝
@@ -14,6 +14,7 @@ modify_delimiter_gui() {
         'semi-colon',   ';',
         'space',        ' ',
         'tab',          '`t',
+        'custom',       '' 
     )
     ; ╔──────────────────────────────────────────────────╗
     ; ║                     make gui                     ║
@@ -36,14 +37,18 @@ modify_delimiter_gui() {
     main_gui.SetFont('cFFFFFF s11', 'Source Sans Pro')
     main_gui.Add('Text', 'x10 y10', 'Current delimiter:')
     current_delimiter := main_gui.Add('DropDownList', 'xp+200 yp w200 Choose1 vCurrentDelimiter', DELIMITERS.Keys)
+    current_custom_delimiter := main_gui.Add('Edit', 'x+10 yp w100 vCurrentCustomDelimiter Hidden')
     ; ╔──────────────────────────────────────────────────╗
     ; ║                  new delimiter                   ║
     ; ╚──────────────────────────────────────────────────╝
     main_gui.Add('Text', 'x10 y+10', 'New delimiter:')
     new_delimiter := main_gui.Add('DropDownList', 'xp+200 yp w200 Choose1 vNewDelimiter', DELIMITERS.Keys)
+    main_gui.SetFont('c000000 s11', 'Source Sans Pro')
+    new_custom_delimiter := main_gui.Add('Edit', 'x+10 yp w100 vNewCustomDelimiter Hidden')
     ; ╔──────────────────────────────────────────────────╗
     ; ║             keep existing delimiter?             ║
     ; ╚──────────────────────────────────────────────────╝
+    main_gui.SetFont('cFFFFFF s11', 'Source Sans Pro')
     main_gui.Add('Text', 'x10 y+10', 'Keep existing delimiter?')
     keep_existing_delimiter := main_gui.Add('Checkbox', 'xp+200 yp Choose0 vKeepExistingDelimiter')
     ; ╔──────────────────────────────────────────────────╗
@@ -70,14 +75,16 @@ modify_delimiter_gui() {
     main_gui.SetFont('c14E0E8 s11', 'Source Sans Pro')
     preview_edit := main_gui.Add('Edit', 'x' (control_width + 40) ' yp+25 w' control_width ' h' (gui_height - 275) ' +Background041B2D ReadOnly vPreview')
     ; ___________________________________________________________
-    main_gui.Add('Button', 'x' (gui_width / 2 - 200) ' y' (gui_height - 40) ' w400 Default', 'Apply changes to clipboard').OnEvent('Click', (*) => replace_delimiters(tmp, main_gui['CurrentDelimiter'].Text, main_gui['NewDelimiter'].Text, main_gui))
+    main_gui.Add('Button', 'x' (gui_width / 2 - 200) ' y' (gui_height - 40) ' w400 Default', 'Apply changes to clipboard').OnEvent('Click', (*) => replace_delimiters(tmp, main_gui))
     ; ___________________________________________________________
-    current_delimiter.OnEvent('Change', (*)         => update_preview(main_gui))
-    new_delimiter.OnEvent('Change', (*)             => update_preview(main_gui))
-    keep_existing_delimiter.OnEvent('Click', (*)    => update_preview(main_gui))
-    wrap_quotes.OnEvent('Click', (*)                => update_preview(main_gui))
-    quotes_type.OnEvent('Change', (*)               => update_preview(main_gui))    
-    main_gui.OnEvent('Close', (*)                   => main_gui.Destroy())
+    current_delimiter.OnEvent('Change', (*) => toggle_custom_delimiter(main_gui, 'Current'))
+    new_delimiter.OnEvent('Change', (*) => toggle_custom_delimiter(main_gui, 'New'))
+    current_custom_delimiter.OnEvent('Change', (*) => update_preview(main_gui))
+    new_custom_delimiter.OnEvent('Change', (*) => update_preview(main_gui))
+    keep_existing_delimiter.OnEvent('Click', (*) => update_preview(main_gui))
+    wrap_quotes.OnEvent('Click', (*) => update_preview(main_gui))
+    quotes_type.OnEvent('Change', (*) => update_preview(main_gui))    
+    main_gui.OnEvent('Close', (*) => main_gui.Destroy())
     ; ___________________________________________________________
     current_delimiter.Text := (detect_delimiter(tmp) != '') ? detect_delimiter(tmp) : 'comma'
     ; ___________________________________________________________
@@ -92,6 +99,8 @@ modify_delimiter_gui() {
         detected_delimiter := ''
         ; ___________________________________________________________
         for delimiter_name, delimiter in DELIMITERS {
+            if (delimiter_name == 'custom')
+                continue
             count := (delimiter = '`n') 
                   ? StrSplit(content, '`n', '`r').Length - 1 
                   : StrSplit(content, delimiter).Length - 1  
@@ -104,6 +113,17 @@ modify_delimiter_gui() {
         return detected_delimiter
     }
     ; ╔──────────────────────────────────────────────────╗
+    ; ║             toggle_custom_delimiter              ║
+    ; ╚──────────────────────────────────────────────────╝
+    toggle_custom_delimiter(gui, prefix) {
+        if (gui[prefix 'Delimiter'].Text == 'custom') {
+            gui[prefix 'CustomDelimiter'].Visible := true
+        } else {
+            gui[prefix 'CustomDelimiter'].Visible := false
+        }
+        update_preview(gui)
+    }
+    ; ╔──────────────────────────────────────────────────╗
     ; ║                  update preview                  ║
     ; ╚──────────────────────────────────────────────────╝
     update_preview(gui) {
@@ -113,8 +133,8 @@ modify_delimiter_gui() {
         current_content := gui['CurrentContent'].Value
         current_delimiter_name := gui['CurrentDelimiter'].Text
         new_delimiter_name := gui['NewDelimiter'].Text
-        current_delimiter := DELIMITERS[current_delimiter_name]
-        new_delimiter := DELIMITERS[new_delimiter_name]
+        current_delimiter := (current_delimiter_name == 'custom') ? gui['CurrentCustomDelimiter'].Text : DELIMITERS[current_delimiter_name]
+        new_delimiter := (new_delimiter_name == 'custom') ? gui['NewCustomDelimiter'].Text : DELIMITERS[new_delimiter_name]
         ; ___________________________________________________________
         split_array := (current_delimiter = '`n') 
                     ? StrSplit(current_content, '`n', '`r') 
@@ -149,9 +169,11 @@ modify_delimiter_gui() {
     ; ╔──────────────────────────────────────────────────╗
     ; ║                replace delimiters                ║
     ; ╚──────────────────────────────────────────────────╝
-    replace_delimiters(tmp, current_delimiter_name, new_delimiter_name, gui) {
-        current_delimiter := DELIMITERS[current_delimiter_name]
-        new_delimiter := DELIMITERS[new_delimiter_name]
+    replace_delimiters(tmp, gui) {
+        current_delimiter_name := gui['CurrentDelimiter'].Text
+        new_delimiter_name := gui['NewDelimiter'].Text
+        current_delimiter := (current_delimiter_name == 'custom') ? gui['CurrentCustomDelimiter'].Text : DELIMITERS[current_delimiter_name]
+        new_delimiter := (new_delimiter_name == 'custom') ? gui['NewCustomDelimiter'].Text : DELIMITERS[new_delimiter_name]
         ; ___________________________________________________________
         split_array := (current_delimiter = '`n') 
                     ? StrSplit(tmp, '`n', '`r') 
@@ -186,6 +208,8 @@ modify_delimiter_gui() {
         CustomMsgBox('Copy or send formatted clip?', 'Copy', 'Send') == 'Copy' 
             ? A_Clipboard := output 
             : (WinActivate('ahk_id ' active_win), WinWaitActive('ahk_id ' active_win), SendClip(output))
+        ; ___________________________________________________________
+        ExitApp
     }
 }
 ; ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
