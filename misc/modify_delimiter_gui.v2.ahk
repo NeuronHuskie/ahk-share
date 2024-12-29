@@ -37,10 +37,12 @@ modify_delimiter_gui() {
     main_gui.SetFont('cFFFFFF s11', 'Source Sans Pro')
     main_gui.Add('Text', 'x10 y10', 'Current delimiter:')
     current_delimiter := main_gui.Add('DropDownList', 'xp+200 yp w200 Choose1 vCurrentDelimiter', DELIMITERS.Keys)
+    main_gui.SetFont('c000000 s11', 'Source Sans Pro')
     current_custom_delimiter := main_gui.Add('Edit', 'x+10 yp w100 vCurrentCustomDelimiter Hidden')
     ; ╔──────────────────────────────────────────────────╗
     ; ║                  new delimiter                   ║
     ; ╚──────────────────────────────────────────────────╝
+    main_gui.SetFont('cFFFFFF s11', 'Source Sans Pro')
     main_gui.Add('Text', 'x10 y+10', 'New delimiter:')
     new_delimiter := main_gui.Add('DropDownList', 'xp+200 yp w200 Choose1 vNewDelimiter', DELIMITERS.Keys)
     main_gui.SetFont('c000000 s11', 'Source Sans Pro')
