@@ -26,7 +26,7 @@ modify_delimiter_gui() {
     gui_height := Min(monitor_height * 0.6, 900)
     control_width := ((gui_width - 60) / 2)
     ; ___________________________________________________________
-    main_gui := Gui('+LastFound +ToolWindow -Caption +Border', 'RxList')
+    main_gui := Gui('+LastFound +ToolWindow -Caption +Border', 'Modify Clip Delimiter')
     main_gui.Opt('+DPIScale')
     main_gui.BackColor := '041B2D'
     main_gui.MarginX := 20
