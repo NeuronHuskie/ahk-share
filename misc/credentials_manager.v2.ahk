@@ -59,8 +59,8 @@ class CREDENTIALS_MANAGER {
 
     static write(name, user_name:='', password:='') {
         cred 		:= Buffer(24 + A_PtrSize * 7, 0)
-	username	:= IsSet(username) ? username : 'null'
-	password	:= IsSet(password) ? password : 'null'
+	user_name	:= IsSet(user_name) ? user_name : 'null'
+	password	:= IsSet(password)  ? password  : 'null'
         pwd_size 	:= StrLen(password) * 2
         params 		:= [
             ['UInt', 	1, 					4 + A_PtrSize * 0],		; Type = CRED_TYPE_GENERIC
