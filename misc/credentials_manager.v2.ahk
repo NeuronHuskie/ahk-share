@@ -57,61 +57,55 @@
 ******************************************************************************************/
 class CREDENTIALS_MANAGER {
 
-    static write(name, user_name:='', password:='') {
-        cred 		:= Buffer(24 + A_PtrSize * 7, 0)
-	user_name	:= IsSet(user_name) ? user_name : 'null'
-	password	:= IsSet(password)  ? password  : 'null'
-        pwd_size 	:= StrLen(password) * 2
-        params 		:= [
-            ['UInt', 	1, 					4 + A_PtrSize * 0],		; Type = CRED_TYPE_GENERIC
-            ['Ptr', 	StrPtr(name), 		8 + A_PtrSize * 0],     ; TargetName
-            ['UInt', 	pwd_size, 			16 + A_PtrSize * 2],    ; CredentialBlobSize
-            ['Ptr', 	StrPtr(password), 	16 + A_PtrSize * 3], 	; CredentialBlob
-            ['UInt', 	3, 					16 + A_PtrSize * 4],    ; Persist = CRED_PERSIST_ENTERPRISE
-            ['Ptr', 	StrPtr(user_name), 	24 + A_PtrSize * 6] 	; UserName
-        ]
-        for param in params
-            NumPut(param[1], param[2], cred, param[3])
-        return DllCall('Advapi32.dll\CredWriteW', 'Ptr', cred, 'UInt', 0, 'UInt')
-    }
+	static get(name)	=> (cred := this.read(name), cred ? cred : this._get_new_credentials(name))
 
-    static delete(name) => DllCall('Advapi32.dll\CredDeleteW', 'WStr', name, 'UInt', 1, 'UInt', 0, 'UInt')
+	static delete(name)	=> DllCall('Advapi32.dll\CredDeleteW', 'WStr', name, 'UInt', 1, 'UInt', 0, 'UInt')
 
-    static read(name) {
-        p_cred 	:= 0
-        success := DllCall('Advapi32.dll\CredReadW', 
-            'Str', name, 
-            'UInt', 1, 
-            'UInt', 0, 
-            'Ptr*', &p_cred, 
-            'UInt')
-        
-        if !p_cred
-            return
-
-        cred_info := {
-            name: 		StrGet(NumGet(p_cred, 	8 + A_PtrSize * 0, 		'UPtr'), 256, 	'UTF-16'),
-            user_name: 	StrGet(NumGet(p_cred, 	24 + A_PtrSize * 6, 	'UPtr'), 256, 	'UTF-16'),
-            password: 	StrGet(NumGet(p_cred, 	16 + A_PtrSize * 3, 	'UPtr'), 
-                        NumGet(p_cred, 			16 + A_PtrSize * 2, 	'UInt') / 2, 	'UTF-16')
-        }
-
-        DllCall('Advapi32.dll\CredFree', 'Ptr', p_cred)
-        return cred_info
-    }
-
-    static get(name) => (cred := this.read(name), cred ? cred : this._get_new_credentials(name))
-
-    static _get_new_credentials(name) {
-        input_name 	:= name ? name : InputBox('Enter the carrier/site name:', 'Credentials').Value
-        user_name 	:= InputBox('Enter the username:', 'Credentials').Value
-        password 	:= InputBox('Enter the password:', 'Credentials').Value
-        
-        this.write(input_name, user_name, password) ? 
-            (cred := this.read(input_name)) : 
-            (MsgBox('Failed to save credentials.`n`nThe script will now exit.'), ExitApp)
-        
-        return cred ? cred : (MsgBox('Credentials were not found.`n`nThe script will now exit.'), ExitApp)
-    }
+	static read(name) {
+		p_cred 		:= 0
+		DllCall('Advapi32.dll\CredReadW',
+			'Str',  name,   	; [in]  LPCWSTR      TargetName
+			'UInt', 1,      	; [in]  DWORD        Type = CRED_TYPE_GENERIC (https://learn.microsoft.com/en-us/windows/win32/api/wincred/ns-wincred-credentiala)
+			'UInt', 0,      	; [in]  DWORD        Flags
+			'Ptr*', &p_cred, 	; [out] PCREDENTIALW *Credential
+			'UInt' 				; BOOL
+		)
+		if !p_cred
+			return
+		name 		:= StrGet(NumGet(p_cred, 8 + A_PtrSize * 0, 'UPtr'), 256, 'UTF-16')
+		username 	:= StrGet(NumGet(p_cred, 24 + A_PtrSize * 6, 'UPtr'), 256, 'UTF-16')
+		len 		:= NumGet(p_cred, 16 + A_PtrSize * 2, 'UInt')
+		password 	:= StrGet(NumGet(p_cred, 16 + A_PtrSize * 3, 'UPtr'), len/2, 'UTF-16')
+		DllCall('Advapi32.dll\CredFree', 'Ptr', p_cred)
+		return {name: name, username: username, password: password}
+	}
 	
-}
+    	static write(name, username:='', password:='') {
+		cred 		:= Buffer(24 + A_PtrSize * 7, 0)
+		username	:= username ? username : 'null'
+		password	:= password ? password : 'null'
+		cbPassword 	:= StrLen(password) * 2
+		NumPut('UInt', 1               , cred,  4+A_PtrSize*0) ; Type = CRED_TYPE_GENERIC
+		NumPut('Ptr',  StrPtr(name)    , cred,  8+A_PtrSize*0) ; TargetName
+		NumPut('UInt', cbPassword      , cred, 16+A_PtrSize*2) ; CredentialBlobSize
+		NumPut('Ptr',  StrPtr(password), cred, 16+A_PtrSize*3) ; CredentialBlob
+		NumPut('UInt', 3               , cred, 16+A_PtrSize*4) ; Persist = CRED_PERSIST_ENTERPRISE (roam across domain)
+		NumPut('Ptr',  StrPtr(username), cred, 24+A_PtrSize*6) ; UserName
+		return DllCall('Advapi32.dll\CredWriteW', 'Ptr', cred, 'UInt', 0, 'UInt')
+			? this.read(name)
+			: false
+	}
+
+	static _get_new_credentials(name) {
+	        input_name 	:= name ? name : InputBox('Enter the carrier/site name:', 'Credentials').Value
+	        username 	:= InputBox('Enter the username:', 'Credentials').Value
+	        password 	:= InputBox('Enter the password:', 'Credentials').Value
+	        
+	        this.write(input_name, username, password) 
+				? (cred := this.read(input_name)) 
+				: (MsgBox('Failed to save credentials.`n`nThe script will now exit.'), ExitApp)
+	        
+	        return cred ? cred : (MsgBox('Credentials were not found.`n`nThe script will now exit.'), ExitApp)
+	}
+	
+}	
