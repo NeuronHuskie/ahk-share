@@ -1,7 +1,7 @@
 #Requires Autohotkey v2.0+
 ; #include <Array>              ; https://github.com/Descolada/AHK-v2-libraries/blob/main/Lib/Array.ahk
 ; #include <child_process>      ; https://github.com/thqby/ahk2_lib/blob/master/child_process.ahk
-; #include <cJSON>              ; h
+; #include <cJSON>              ; https://github.com/G33kDude/cJson.ahk
 ; #include <OVERLAPPED>         ; https://github.com/thqby/ahk2_lib/blob/master/OVERLAPPED.ahk
 
 
