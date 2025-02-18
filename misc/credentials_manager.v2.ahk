@@ -59,7 +59,7 @@ class CREDENTIALS_MANAGER {
 
 	static get(name)	=> (cred := this.read(name), cred ? cred : this._get_new_credentials(name))
 
-	static delete(name)	=> DllCall('Advapi32.dll\CredDeleteW', 'WStr', name, 'UInt', 1, 'UInt', 0, 'UInt')
+	static delete(name) => DllCall('Advapi32.dll\CredDeleteW', 'WStr', name, 'UInt', 1, 'UInt', 0, 'UInt')
 
 	static read(name) {
 		p_cred 		:= 0
@@ -68,7 +68,7 @@ class CREDENTIALS_MANAGER {
 			'UInt', 1,      	; [in]  DWORD        Type = CRED_TYPE_GENERIC (https://learn.microsoft.com/en-us/windows/win32/api/wincred/ns-wincred-credentiala)
 			'UInt', 0,      	; [in]  DWORD        Flags
 			'Ptr*', &p_cred, 	; [out] PCREDENTIALW *Credential
-			'UInt' 				; BOOL
+			'UInt' 			; BOOL
 		)
 		if !p_cred
 			return
@@ -96,16 +96,16 @@ class CREDENTIALS_MANAGER {
 			: false
 	}
 
-	static _get_new_credentials(name) {
-	        input_name 	:= name ? name : InputBox('Enter the carrier/site name:', 'Credentials').Value
-	        username 	:= InputBox('Enter the username:', 'Credentials').Value
-	        password 	:= InputBox('Enter the password:', 'Credentials').Value
-	        
-	        this.write(input_name, username, password) 
-				? (cred := this.read(input_name)) 
-				: (MsgBox('Failed to save credentials.`n`nThe script will now exit.'), ExitApp)
-	        
-	        return cred ? cred : (MsgBox('Credentials were not found.`n`nThe script will now exit.'), ExitApp)
-	}
-	
-}	
+    	static _get_new_credentials(name) {
+        	input_name 	:= name ? name : InputBox('Enter the carrier/site name:', 'Credentials').Value
+        	username 	:= InputBox('Enter the username:', 'Credentials').Value
+        	password 	:= InputBox('Enter the password:', 'Credentials').Value
+        
+        	this.write(input_name, username, password) 
+			? (cred := this.read(input_name)) 
+			: (MsgBox('Failed to save credentials.`n`nThe script will now exit.'), ExitApp)
+        
+        	return cred ? cred : (MsgBox('Credentials were not found.`n`nThe script will now exit.'), ExitApp)
+    	}
+
+}
