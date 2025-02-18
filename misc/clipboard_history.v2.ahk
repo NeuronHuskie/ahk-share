@@ -90,11 +90,11 @@ class clipboard_history {   ;   inspired by CL3 ahkv1   - https://github.com/hi5
             } else if (index == 26) {
                 HISTORY_MENU.Add()
                 HISTORY_MENU.Add('z.            ━━━━━━━━━━━━━━━━    MORE HISTORY    ━━━━━━━━━━━━━━━━   ', MORE_MENU)
-                menu_text   := 'a. ' this.format_menu_text(item['text'])
+                menu_text   := 'a. ' this.format_menu_text(item['text'])  
                 target_menu := MORE_MENU
                 bind_index  := index
-            } else {
-                menu_text   := Chr(96 + (index - 26)) '. ' this.format_menu_text(item['text'])
+            } else if (index <= 51) { 
+                menu_text   := Chr(96 + (index - 25)) '. ' this.format_menu_text(item['text'])  
                 target_menu := MORE_MENU
                 bind_index  := index
             }
